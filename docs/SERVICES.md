@@ -113,8 +113,8 @@ The request-sidecar depends on the request-service health check before starting.
 The current system is a simulation and does not connect to real emergency databases, external APIs, or user data. The services return synthetic data that represents the behavior of the planned distributed system.
 
 Future sprints will expand the architecture with additional services and distributed-system patterns to support the complete community emergency resource coordination workflow.
-... (1 line left)
 
+```text
 Community Emergency Resource Coordination System
 
                                   Client / Resident
@@ -124,7 +124,7 @@ Community Emergency Resource Coordination System
                               +---------------------+
                               |   request-service   |
                               |                     |
-                              | POST /requests     |
+                              | POST /requests      |
                               | Emergency Requests |
                               +---------------------+
                                          ^
@@ -145,6 +145,7 @@ Community Emergency Resource Coordination System
                               +---------------------+
                               |  dispatch-service   |
                               |                     |
-                              | POST /dispatch     |
+                              | POST /dispatch      |
                               | Resource Assignment |
                               +---------------------+
+```
