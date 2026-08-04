@@ -188,3 +188,32 @@ flowchart TD
 
 
     Volunteer1 --> Sidecar[Volunteer Sidecar]
+
+
+### 4. What each new part represents
+
+Your new additions:
+
+
+Gateway
+|
+v
+Caddy
+|
++---- Volunteer Service Replica 1
+|
++---- Volunteer Service Replica 2
+|
++---- Volunteer Service Replica 3
+|
+v
+Redis Cache
+
+
+Meaning:
+
+- **Caddy** = load balancer
+- **Replicas** = multiple copies of the same service
+- **Redis** = caching layer
+
+---
