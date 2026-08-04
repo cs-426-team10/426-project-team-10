@@ -189,22 +189,6 @@ flowchart TD
 
     Volunteer1 --> Sidecar[Volunteer Sidecar]
 
-
-Gateway
-|
-v
-Caddy
-|
-+---- Volunteer Service Replica 1
-|
-+---- Volunteer Service Replica 2
-|
-+---- Volunteer Service Replica 3
-|
-v
-Redis Cache
-
-
 Meaning:
 
 - **Caddy** = load balancer
