@@ -190,8 +190,6 @@ flowchart TD
     Volunteer1 --> Sidecar[Volunteer Sidecar]
 
 
-### 4. What each new part represents
-
 Your new additions:
 
 
