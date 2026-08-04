@@ -194,5 +194,3 @@ Meaning:
 - **Caddy** = load balancer
 - **Replicas** = multiple copies of the same service
 - **Redis** = caching layer
-
----
