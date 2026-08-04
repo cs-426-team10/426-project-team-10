@@ -149,3 +149,42 @@ Community Emergency Resource Coordination System
                               | Resource Assignment |
                               +---------------------+
 ```
+
+# Services Architecture
+
+```mermaid
+flowchart TD
+
+    Client[Residents / Responders]
+
+    Client --> Gateway[API Gateway]
+
+
+    Gateway --> Caddy[Caddy Load Balancer]
+
+
+    Caddy --> Volunteer1[Volunteer Service Replica 1]
+    Caddy --> Volunteer2[Volunteer Service Replica 2]
+    Caddy --> Volunteer3[Volunteer Service Replica 3]
+
+
+    Volunteer1 --> Redis[(Redis Cache)]
+    Volunteer2 --> Redis
+    Volunteer3 --> Redis
+
+
+    Volunteer1 --> Database[(Database)]
+    Volunteer2 --> Database
+    Volunteer3 --> Database
+
+
+    Gateway --> Dispatch[Dispatch Service]
+
+    Dispatch --> Shelter[Shelter Service]
+
+    Dispatch --> FoodBank[Food Bank Service]
+
+    Dispatch --> Healthcare[Healthcare Service]
+
+
+    Volunteer1 --> Sidecar[Volunteer Sidecar]
