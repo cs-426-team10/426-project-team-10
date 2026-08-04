@@ -190,9 +190,6 @@ flowchart TD
     Volunteer1 --> Sidecar[Volunteer Sidecar]
 
 
-Your new additions:
-
-
 Gateway
 |
 v
