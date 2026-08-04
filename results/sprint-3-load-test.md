@@ -2,68 +2,42 @@
 
 ## Test Configuration
 
-The load test was performed using k6 against the replicated service endpoint behind Caddy.
+The replicated service was tested using k6 against the dispatch service endpoint.
 
-Configuration:
+- Endpoint tested: `POST http://localhost:3001/dispatch`
+- Virtual users: 10
+- Test duration: 30 seconds
 
-- Virtual Users: 10
-- Duration: 30 seconds
-- Endpoint: Volunteer Service API
+The load test simulated concurrent dispatch requests to measure latency, throughput, and reliability under load.
 
 ## Results
 
+The k6 test produced the following results:
+
 | Metric | Value |
 |---|---|
-| p50 latency | 40 ms |
-| p95 latency | 120 ms |
-| p99 latency | 180 ms |
-| Request rate | 30 requests/sec |
-| Error rate | 0% |
+| p50 latency | XX ms |
+| p95 latency | XX ms |
+| p99 latency | XX ms |
+| Request rate | XX requests/sec |
+| Error rate | XX% |
 
 ## SLO Comparison
 
-The system SLO targets are defined in `docs/SLO.md`.
+The results were compared against the performance targets defined in `docs/SLO.md`.
 
-### Latency
+| SLO | Target | Result | Status |
+|---|---|---|---|
+| p95 latency | XX ms | XX ms | Met / Not Met |
+| Error rate | XX% | XX% | Met / Not Met |
+| Request throughput | XX requests/sec | XX requests/sec | Met / Not Met |
 
-Target:
-- p95 latency below 500ms
-
-Result:
-- p95 latency was 120ms
-
-Status:
-- Meeting SLO
-
-### Availability
-
-Target:
-- Service availability above 99%
-
-Result:
-- No failed requests occurred during the load test.
-
-Status:
-- Meeting SLO
-
-### Error Rate
-
-Target:
-- Error rate below 1%
-
-Result:
-- Error rate was 0%.
-
-Status:
-- Meeting SLO
-
+Based on the load test results, the service met the SLO requirements for ________. However, it did not meet the requirements for ________.
 
 ## Interpretation
 
-The load test shows that the replicated service can handle concurrent requests successfully.
+The load test results show how the dispatch service performs when handling multiple concurrent requests. The median latency (p50) represents the typical response time, while the p95 and p99 values show the experience of slower requests during periods of increased load.
 
-Caddy distributes traffic across multiple service instances, preventing a single instance from handling all requests.
+The main source of latency is likely the simulated 500ms processing delay in the `/dispatch` endpoint. Each request intentionally waits before returning a response, which increases overall response time. If latency needs to be improved, the service could reduce unnecessary waiting, optimize processing steps, or move longer operations into an asynchronous background workflow.
 
-The Redis cache reduces latency for repeated requests by returning cached results instead of recomputing data.
-
-The current bottleneck is likely service processing time and network communication between services. Future improvements could include increasing replica counts, adding asynchronous processing for slower operations, and adding monitoring to identify expensive requests.
+The error rate indicates the reliability of the service under load. If errors remain low, the service is handling concurrent requests successfully. Future improvements could include adding more replicas, improving load balancing, adding caching where appropriate, and monitoring resource usage to identify additional bottlenecks.                                                    
