@@ -189,6 +189,6 @@ flowchart TD
 
     Volunteer1 --> Sidecar[Volunteer Sidecar]
 
-- **Caddy** = load balancer
+
 - **Replicas** = multiple copies of the same service
 - **Redis** = caching layer
