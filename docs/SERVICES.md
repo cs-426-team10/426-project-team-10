@@ -193,4 +193,5 @@ flowchart TD
 
 
     Request1 --> Sidecar[Request Sidecar]
+    Request2 -.-> Sidecar
 ```
