@@ -9,7 +9,7 @@ export const options = {
 export default function () {
 
     const response = http.get(
-        "http://host.docker.internal:8080/requests/test"
+        "http://localhost:8080/requests/test"
     );
 
     check(response, {
