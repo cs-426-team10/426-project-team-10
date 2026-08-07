@@ -1,16 +1,4 @@
 services:
-  request-service:
-    build: ./request-service
-    container_name: request-service
-    ports:
-      - "3000:3000"
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 5s
-
   dispatch-service:
     build: ./dispatch-service
     container_name: dispatch-service
@@ -28,6 +16,24 @@ services:
     container_name: request-sidecar
     ports:
       - "4003:4000"
+
+  request-service-1:
+    build: ./request-service
     depends_on:
-      request-service:
-        condition: service_healthy
+      - redis
+
+  request-service-2:
+    build: ./request-service
+    depends_on:
+      - redis
+
+  caddy:
+    build: ./caddy
+    ports:
+      - "8080:80"
+    depends_on:
+      - request-service-1
+      - request-service-2
+
+  redis:
+    image: redis:7

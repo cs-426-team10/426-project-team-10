@@ -1,0 +1,10 @@
+:80 {
+
+    reverse_proxy {
+        to request-service-1:3000
+        to request-service-2:3000
+
+        lb_policy round_robin
+    }
+
+}
