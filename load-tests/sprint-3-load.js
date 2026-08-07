@@ -2,29 +2,20 @@ import http from "k6/http";
 import { check, sleep } from "k6";
 
 export const options = {
-  vus: 10,
-  duration: "30s",
+    vus: 10,
+    duration: "30s",
 };
 
 export default function () {
-  const url = "http://localhost:3001/dispatch";
 
-  const payload = JSON.stringify({
-    request_id: "REQ-1001",
-    urgency: "high",
-  });
+    const response = http.get(
+        "http://host.docker.internal:8080/requests/test"
+    );
 
-  const params = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  };
+    check(response, {
+        "status is 200": (r) => r.status === 200,
+    });
 
-  const res = http.post(url, payload, params);
-
-  check(res, {
-    "status is 200": (r) => r.status === 200,
-  });
-
-  sleep(1);
+    sleep(1);
 }
+
