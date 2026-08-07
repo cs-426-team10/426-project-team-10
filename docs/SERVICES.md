@@ -173,8 +173,9 @@ flowchart TD
     Caddy --> Request1[Request Service Replica 1]
     Caddy --> Request2[Request Service Replica 2]
 
+    Redis[(Shared Redis Cache)]
 
-    Request1 --> Redis[(Redis Cache)]
+    Request1 --> Redis
     Request2 --> Redis
 
 
