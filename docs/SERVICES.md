@@ -192,6 +192,6 @@ flowchart TD
     Dispatch --> Healthcare[Healthcare Service]
 
 
-    Request1 --> Sidecar[Request Sidecar]
+    Request1 -.-> Sidecar[Request Sidecar]
     Request2 -.-> Sidecar
 ```
