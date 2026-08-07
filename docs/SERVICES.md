@@ -1,15 +1,22 @@
 # Initial Service List
 
 ## api-gateway-service: - Serves as the single entry point for all client requests.
+
 - Routes requests to the appropriate backend service.
 - Handles authentication, authorization, rate limiting, and request validation.
+
 ## request-service: - Accepts and manages emergency assistance requests.
+
 - Tracks request status (submitted, assigned, in progress, completed).
 - Stores request details, including location, urgency, and resource needs.
+
 ## volunteer-service: - Manages volunteer accounts and availability.
+
 - Matches volunteers with assistance requests based on location and skills.
 - Updates volunteer assignments and completion status.
+
 ## dispatch-service: - Coordinates emergency response and resource allocation.
+
 - Assigns requests to volunteers, shelters, or emergency responders.
 - Prioritizes high-urgency requests and sends notifications when assignments are made.
 
@@ -163,19 +170,16 @@ flowchart TD
     Gateway --> Caddy[Caddy Load Balancer]
 
 
-    Caddy --> Volunteer1[Volunteer Service Replica 1]
-    Caddy --> Volunteer2[Volunteer Service Replica 2]
-    Caddy --> Volunteer3[Volunteer Service Replica 3]
+    Caddy --> Request1[Request Service Replica 1]
+    Caddy --> Request2[Request Service Replica 2]
 
 
-    Volunteer1 --> Redis[(Redis Cache)]
-    Volunteer2 --> Redis
-    Volunteer3 --> Redis
+    Request1 --> Redis[(Redis Cache)]
+    Request2 --> Redis
 
 
-    Volunteer1 --> Database[(Database)]
-    Volunteer2 --> Database
-    Volunteer3 --> Database
+    Request1 --> Database[(Database)]
+    Request2 --> Database
 
 
     Gateway --> Dispatch[Dispatch Service]
@@ -187,4 +191,5 @@ flowchart TD
     Dispatch --> Healthcare[Healthcare Service]
 
 
-    Volunteer1 --> Sidecar[Volunteer Sidecar]
+    Request1 --> Sidecar[Request Sidecar]
+```
