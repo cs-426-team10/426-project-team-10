@@ -178,11 +178,6 @@ flowchart TD
     Request1 --> Redis
     Request2 --> Redis
 
-
-    Request1 --> Database[(Database)]
-    Request2 --> Database
-
-
     Gateway --> Dispatch[Dispatch Service]
 
     Dispatch --> Shelter[Shelter Service]
