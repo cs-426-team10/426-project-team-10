@@ -191,6 +191,10 @@ flowchart TD
 
     Dispatch --> Healthcare[Healthcare Service]
 
+    Request1 -->|Enqueue request| RabbitMQ[(RabbitMQ<br/>request-processing queue)]
+    Request2 -->|Enqueue request| RabbitMQ
+
+    RabbitMQ -->|Consume job| Worker[Async Worker]
 
     Request1 -.-> Sidecar[Request Sidecar]
     Request2 -.-> Sidecar
