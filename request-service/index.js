@@ -1,5 +1,6 @@
 import express from "express";
 import { createClient } from "redis";
+import amqp from "amqplib";
 
 const app = express();
 
@@ -18,6 +19,19 @@ redis.on("error", (err) => {
 await redis.connect();
 
 console.log("Connected to Redis");
+
+const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://rabbitmq:5672";
+
+const QUEUE_NAME = "request-processing";
+
+const rabbitConnection = await amqp.connect(RABBITMQ_URL);
+const rabbitChannel = await rabbitConnection.createChannel();
+
+await rabbitChannel.assertQueue(QUEUE_NAME, {
+  durable: true,
+});
+
+console.log("Connected to RabbitMQ");
 
 app.get("/requests/:id", async (req, res) => {
   const id = req.params.id;
@@ -50,28 +64,37 @@ app.get("/requests/:id", async (req, res) => {
   });
 });
 
-app.post("/requests", (req, res) => {
+app.post("/requests", async (req, res) => {
   console.log("Received emergency request");
 
   const { resident_id, location, urgency, need } = req.body;
 
-  setTimeout(() => {
-    res.status(201).json({
-      request_id: `REQ-${Date.now()}`,
-      resident_id,
-      location,
-      urgency,
-      need,
-      status: "submitted",
-      created_at: new Date().toISOString(),
-    });
-  }, 200);
+  const job = {
+    resident_id,
+    location,
+    urgency,
+    need,
+    created_at: new Date().toISOString(),
+  };
+
+  rabbitChannel.sendToQueue(QUEUE_NAME, Buffer.from(JSON.stringify(job)), {
+    persistent: true,
+  });
+
+  console.log("Enqueued job:", job);
+
+  //201: accepted for processing and processing is finished
+  //202: accepted for processing, but processing isn't finished yet
+  res.status(202).json({
+    message: "Emergency request accepted",
+    status: "queued",
+    job,
+  });
 });
 
 app.get("/health", (req, res) => {
   res.json({
-    service: "request-service",
-    status: "healthy",
+    status: "ok",
   });
 });
 

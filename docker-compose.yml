@@ -19,13 +19,23 @@ services:
 
   request-service-1:
     build: ./request-service
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq:5672
     depends_on:
-      - redis
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   request-service-2:
     build: ./request-service
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq:5672
     depends_on:
-      - redis
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   caddy:
     build: ./caddy
@@ -37,3 +47,19 @@ services:
 
   redis:
     image: redis:7
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  async-worker:
+    build: ./async-worker
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
