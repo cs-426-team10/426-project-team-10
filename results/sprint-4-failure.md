@@ -19,7 +19,7 @@ The system was tested through Caddy, which load balances requests between the tw
 
 ## System Response
 
-The system does not completely fail when one replica is intentionally slowed down. Caddy continues to route requests through the available request-service replicas. During testing, a request routed to the healthy replica completed successfully, while the fault-injected replica logged the five-second delay.
+The system does not completely fail when one replica is intentionally slowed down. Caddy continues to route requests between the two request-service replicas, so the system remains available even though one replica is intentionally slowed down. During testing, a request routed to the healthy replica completed successfully, while the fault-injected replica logged the five-second delay.
 
 The test also demonstrated the shared Redis cache. The first request for `failure-test` was a cache miss and took approximately 1.27 seconds. A second request for the same ID was a cache hit and completed in approximately 0.13 seconds.
 
