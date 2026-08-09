@@ -36,6 +36,13 @@ console.log("Connected to RabbitMQ");
 app.get("/requests/:id", async (req, res) => {
   const id = req.params.id;
 
+  const faultDelay = Number(process.env.FAULT_DELAY_MS || 0);
+
+  if (faultDelay > 0) {
+    console.log(`Fault injection: delaying request by ${faultDelay}ms`);
+    await new Promise((resolve) => setTimeout(resolve, faultDelay));
+  }
+
   const cached = await redis.get(id);
 
   if (cached) {
@@ -108,4 +115,10 @@ app.get("/requests", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Request service running on port ${PORT}`);
+});
+
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+  });
 });
