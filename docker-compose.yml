@@ -16,14 +16,30 @@ services:
     container_name: request-sidecar
     ports:
       - "4003:4000"
-
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    depends_on:
+      request-service-1:
+        condition: service_healthy
+      request-service-2:
+        condition: service_healthy
+        
   request-service-1:
     build: ./request-service
     environment:
       RABBITMQ_URL: amqp://rabbitmq:5672
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
     depends_on:
       redis:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
 
@@ -31,22 +47,40 @@ services:
     build: ./request-service
     environment:
       RABBITMQ_URL: amqp://rabbitmq:5672
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
     depends_on:
       redis:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
 
   caddy:
     build: ./caddy
     ports:
-      - "8080:80"
+      - "8080:80" 
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/requests"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     depends_on:
-      - request-service-1
-      - request-service-2
+      request-service-1:
+        condition: service_healthy
+      request-service-2:
+        condition: service_healthy
 
   redis:
     image: redis:7
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -60,6 +94,11 @@ services:
     build: ./async-worker
     environment:
       RABBITMQ_URL: amqp://rabbitmq:5672
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     depends_on:
       rabbitmq:
         condition: service_healthy

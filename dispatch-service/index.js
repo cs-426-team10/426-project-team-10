@@ -1,3 +1,4 @@
+
 import express from "express";
 
 const app = express(); //contains Express application
@@ -25,8 +26,7 @@ app.post("/dispatch", (req, res) => {
 
 app.get("/health", (req, res) => {
   res.json({
-    service: "dispatch-service",
-    status: "healthy",
+    status: "ok",
   });
 });
 

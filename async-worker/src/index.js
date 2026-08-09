@@ -1,4 +1,15 @@
 const amqp = require("amqplib");
+const express = require("express");
+
+const healthApp = express();
+
+healthApp.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+healthApp.listen(3000, () => {
+  console.log("Async worker health server running on port 3000");
+});
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://rabbitmq:5672";
 const QUEUE_NAME = "request-processing";
@@ -6,6 +17,7 @@ const QUEUE_NAME = "request-processing";
 async function start() {
   const connection = await amqp.connect(RABBITMQ_URL);
   const channel = await connection.createChannel();
+  
 
   await channel.assertQueue(QUEUE_NAME, {
     durable: true,

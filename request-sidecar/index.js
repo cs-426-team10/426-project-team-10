@@ -3,37 +3,47 @@ import express from "express";
 const app = express();
 
 const PORT = 4000;
-const REQUEST_SERVICE_URL = "http://request-service:3000";
 
-async function checkRequestService() {
-  try {
-    const response = await fetch(`${REQUEST_SERVICE_URL}/health`);
+const REQUEST_SERVICE_URLS = [
+  "http://request-service-1:3000/health",
+  "http://request-service-2:3000/health",
+];
 
-    if (response.ok) {
+async function checkRequestServices() {
+  for (const url of REQUEST_SERVICE_URLS) {
+    try {
+      const response = await fetch(url);
+
+      if (response.ok) {
+        console.log(
+          [SIDECAR] ${url} heartbeat OK,
+          new Date().toISOString(),
+        );
+      } else {
+        console.log(
+          [SIDECAR] ${url} unhealthy,
+          new Date().toISOString(),
+        );
+      }
+    } catch (error) {
       console.log(
-        "[SIDECAR] request-service heartbeat OK",
-        new Date().toISOString(),
-      );
-    } else {
-      console.log(
-        "[SIDECAR] request-service unhealthy",
+        [SIDECAR] ${url} unavailable,
         new Date().toISOString(),
       );
     }
-  } catch (error) {
-    console.log(
-      "[SIDECAR] request-service unavailable",
-      new Date().toISOString(),
-    );
   }
 }
 
-setInterval(checkRequestService, 5000);
+checkRequestServices();
+setInterval(checkRequestServices, 5000);
 
 app.get("/logs", (req, res) => {
   res.json({
     service: "request-sidecar",
-    monitored_service: "request-service",
+    monitored_services: [
+      "request-service-1",
+      "request-service-2",
+    ],
     status: "monitoring",
     timestamp: new Date().toISOString(),
   });
@@ -41,11 +51,10 @@ app.get("/logs", (req, res) => {
 
 app.get("/health", (req, res) => {
   res.json({
-    service: "request-sidecar",
-    status: "healthy",
+    status: "ok",
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`Request sidecar running on port ${PORT}`);
+  console.log(Request sidecar running on port ${PORT});
 });
