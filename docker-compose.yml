@@ -26,7 +26,7 @@ services:
         condition: service_healthy
       request-service-2:
         condition: service_healthy
-        
+
   request-service-1:
     build: ./request-service
     environment:
@@ -64,7 +64,7 @@ services:
   caddy:
     build: ./caddy
     ports:
-      - "8080:80" 
+      - "8080:80"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost/requests"]
       interval: 5s
@@ -103,4 +103,14 @@ services:
       retries: 5
     depends_on:
       rabbitmq:
+        condition: service_healthy
+
+  prometheus:
+    build: ./prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      request-service-1:
+        condition: service_healthy
+      request-service-2:
         condition: service_healthy

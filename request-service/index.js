@@ -1,11 +1,15 @@
 import express from "express";
 import { createClient } from "redis";
 import amqp from "amqplib";
+import { metricsMiddleware, metricsHandler } from "./metrics.js";
 
 const app = express();
 
 app.use(express.json()); //converts JSON text into JavaScript object
 
+app.use(metricsMiddleware); //middleware to collect metrics for each request
+
+app.get("/metrics", metricsHandler); //endpoint to expose metrics for Prometheus
 const PORT = 3000;
 
 const redis = createClient({
