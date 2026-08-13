@@ -114,3 +114,10 @@ services:
         condition: service_healthy
       request-service-2:
         condition: service_healthy
+
+  grafana:
+    build: ./grafana
+    ports:
+      - "3002:3000"
+    depends_on:
+      - prometheus
