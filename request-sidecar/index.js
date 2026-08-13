@@ -9,27 +9,37 @@ const REQUEST_SERVICE_URLS = [
   "http://request-service-2:3000/health",
 ];
 
+function log(level, message, extra = {}) {
+  console.log(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      ...extra,
+    }),
+  );
+}
+
 async function checkRequestServices() {
   for (const url of REQUEST_SERVICE_URLS) {
     try {
       const response = await fetch(url);
 
       if (response.ok) {
-        console.log(
-          [SIDECAR] ${url} heartbeat OK,
-          new Date().toISOString(),
-        );
+        log("info", "Request service heartbeat OK", {
+          serviceUrl: url,
+        });
       } else {
-        console.log(
-          [SIDECAR] ${url} unhealthy,
-          new Date().toISOString(),
-        );
+        log("warn", "Request service unhealthy", {
+          serviceUrl: url,
+          statusCode: response.status,
+        });
       }
     } catch (error) {
-      console.log(
-        [SIDECAR] ${url} unavailable,
-        new Date().toISOString(),
-      );
+      log("error", "Request service unavailable", {
+        serviceUrl: url,
+        error: error.message,
+      });
     }
   }
 }
@@ -56,5 +66,7 @@ app.get("/health", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(Request sidecar running on port ${PORT});
+  log("info", "Request sidecar running", {
+    port: PORT,
+  });
 });
