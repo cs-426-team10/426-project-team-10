@@ -5,6 +5,18 @@ import { metricsMiddleware, metricsHandler } from "./metrics.js";
 
 const app = express();
 
+const log = (level, message, extra = {}) => {
+  console.log(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      ...extra,
+    })
+  );
+};
+
+
 app.use(express.json()); //converts JSON text into JavaScript object
 
 app.use(metricsMiddleware); //middleware to collect metrics for each request
@@ -17,12 +29,19 @@ const redis = createClient({
 });
 
 redis.on("error", (err) => {
-  console.error("Redis error:", err);
+  log("error", "Redis error", {
+    error: err.message,
+  });
 });
 
-await redis.connect();
-
-console.log("Connected to Redis");
+try {
+  await redis.connect();
+  log("info", "Connected to Redis");
+} catch (err) {
+  log("error", "Failed to connect to Redis", {
+    error: err.message,
+  });
+}
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://rabbitmq:5672";
 
@@ -35,7 +54,7 @@ await rabbitChannel.assertQueue(QUEUE_NAME, {
   durable: true,
 });
 
-console.log("Connected to RabbitMQ");
+log("info", "Connected to RabbitMQ");
 
 app.get("/requests/:id", async (req, res) => {
   const id = req.params.id;
@@ -43,7 +62,9 @@ app.get("/requests/:id", async (req, res) => {
   const faultDelay = Number(process.env.FAULT_DELAY_MS || 0);
 
   if (faultDelay > 0) {
-    console.log(`Fault injection: delaying request by ${faultDelay}ms`);
+    log("warn", "Fault injection: delaying request", {
+      faultDelay,
+    });
     await new Promise((resolve) => setTimeout(resolve, faultDelay));
   }
 
@@ -76,7 +97,6 @@ app.get("/requests/:id", async (req, res) => {
 });
 
 app.post("/requests", async (req, res) => {
-  console.log("Received emergency request");
 
   const { resident_id, location, urgency, need } = req.body;
 
@@ -92,7 +112,9 @@ app.post("/requests", async (req, res) => {
     persistent: true,
   });
 
-  console.log("Enqueued job:", job);
+  log("info", "Enqueued job", {
+    job,
+  });
 
   //201: accepted for processing and processing is finished
   //202: accepted for processing, but processing isn't finished yet
@@ -100,6 +122,12 @@ app.post("/requests", async (req, res) => {
     message: "Emergency request accepted",
     status: "queued",
     job,
+  });
+
+  log("info", "Request completed", {
+    method: req.method,
+    path: req.path,
+    statusCode: res.statusCode,
   });
 });
 
@@ -118,11 +146,8 @@ app.get("/requests", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Request service running on port ${PORT}`);
-});
-
-app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
+  log("info", "Request service running", {
+    port: PORT,
   });
 });
+
