@@ -12,10 +12,9 @@ const log = (level, message, extra = {}) => {
       level,
       message,
       ...extra,
-    })
+    }),
   );
 };
-
 
 app.use(express.json()); //converts JSON text into JavaScript object
 
@@ -71,11 +70,22 @@ app.get("/requests/:id", async (req, res) => {
   const cached = await redis.get(id);
 
   if (cached) {
-    return res.json({
+    const response = {
       source: "cache-hit",
       instance: process.env.HOSTNAME,
       data: JSON.parse(cached),
+    };
+
+    res.status(200).json(response);
+
+    log("info", "Request completed", {
+      method: req.method,
+      path: req.path,
+      statusCode: res.statusCode,
+      source: "cache-hit",
     });
+
+    return;
   }
 
   // simulate slow computation/database call
@@ -89,15 +99,23 @@ app.get("/requests/:id", async (req, res) => {
 
   await redis.set(id, JSON.stringify(result));
 
-  res.json({
+  const response = {
     source: "cache-miss",
     instance: process.env.HOSTNAME,
     data: result,
+  };
+
+  res.status(200).json(response);
+
+  log("info", "Request completed", {
+    method: req.method,
+    path: req.path,
+    statusCode: res.statusCode,
+    source: "cache-miss",
   });
 });
 
 app.post("/requests", async (req, res) => {
-
   const { resident_id, location, urgency, need } = req.body;
 
   const job = {
@@ -150,4 +168,3 @@ app.listen(PORT, () => {
     port: PORT,
   });
 });
-
