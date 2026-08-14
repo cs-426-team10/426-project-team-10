@@ -11,3 +11,18 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets: ["request-service-2:3000"]
+
+  - job_name: "dispatch-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["dispatch-service:3001"]
+
+  - job_name: "request-sidecar"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["request-sidecar:4000"]
+
+  - job_name: "async-worker"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["async-worker:3000"]
